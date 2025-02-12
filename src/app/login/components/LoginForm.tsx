@@ -34,12 +34,6 @@ export default function LoginForm() {
             setLoading(true);
             const result = await loginUser(data);
             console.log("Respuesta del servidor:", result);
-
-            if (result.token && typeof window !== "undefined") {
-                localStorage.setItem("jwt", result.token);
-                console.log("JWT guardado:", result.token);
-            }
-
             reset();
         } catch (error) {
             console.error("Error durante el inicio de sesión:", error);
@@ -57,12 +51,22 @@ export default function LoginForm() {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div>
                             <label className="block text-md">Email</label>
-                            <Input {...register("email")} type="email" placeholder="Email" className="w-full p-2 border border-gray-300 rounded-md" />
+                            <Input
+                                {...register("email")}
+                                type="email"
+                                placeholder="Email"
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                            />
                             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                         </div>
                         <div>
                             <label className="block text-md">Contraseña</label>
-                            <Input {...register("password")} type="password" placeholder="******" className="w-full p-2 border border-gray-300 rounded-md" />
+                            <Input
+                                {...register("password")}
+                                type="password"
+                                placeholder="******"
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                            />
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                         </div>
                         <Button

@@ -1,3 +1,9 @@
+import {
+  handleTokenMiddleware,
+  redirectToDashboardMiddleware,
+  handleErrorMiddleware,
+} from "./middleware";
+
 export async function loginUser(credentials: {
   email: string;
   password: string;
@@ -16,13 +22,16 @@ export async function loginUser(credentials: {
       throw new Error(errorData?.message || "Error en el servidor");
     }
 
-    return await response.json();
-  } catch (error) {
-    if (error instanceof TypeError) {
-      throw new Error("Error de conexión. Revisa tu internet.");
+    const result = await response.json();
+
+    if (result.token) {
+      handleTokenMiddleware(result.token);
+      redirectToDashboardMiddleware();
     }
-    throw new Error(
-      error instanceof Error ? error.message : "Ocurrió un error inesperado."
-    );
+
+    return result;
+  } catch (error) {
+    handleErrorMiddleware(error);
+    throw error;
   }
 }
