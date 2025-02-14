@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { loginUser } from "@/app/actions/auth";
 import { useRouter } from "next/navigation";
+
 import Image from "next/image";
+import { useAuth } from "@/context/hook/useAuth";
+
 
 const loginSchema = z.object({
     email: z.string().email("Por favor, ingresa un correo válido."),
@@ -27,12 +30,14 @@ export default function LoginForm() {
     });
 
     const router = useRouter();
+    const { login } = useAuth();
 
     const onSubmit = async (data: LoginFormInputs) => {
         try {
-            const result = await loginUser(data);
+            const result = await loginUser(data, login);
             console.log("Respuesta del servidor:", result);
             reset();
+            router.push("/dashboard");
         } catch (error) {
             console.error("Error durante el inicio de sesión:", error);
         }
@@ -41,7 +46,6 @@ export default function LoginForm() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0">
-                {/* Formulario */}
                 <div className="flex flex-col justify-center p-8 md:p-14">
                     <h2 className="mb-4 text-4xl font-bold">Bienvenido a la plataforma</h2>
                     <p className="font-light text-gray-400 mb-8">Ingresa tus Datos</p>
@@ -66,7 +70,6 @@ export default function LoginForm() {
                             />
                             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                         </div>
-                        {/* Botón de Iniciar Sesión */}
                         <Button
                             type="submit"
                             disabled={isSubmitting}
@@ -102,7 +105,6 @@ export default function LoginForm() {
                         </Button>
                     </form>
 
-                    {/* Botón de Registro */}
                     <div className="mt-4 text-center">
                         <p className="text-gray-500 text-sm">¿No tienes una cuenta?</p>
                         <Button
@@ -114,8 +116,6 @@ export default function LoginForm() {
                         </Button>
                     </div>
                 </div>
-
-                {/* Imagen */}
                 <div className="relative hidden md:block">
                     <Image
                         src="/barberia.jpg"

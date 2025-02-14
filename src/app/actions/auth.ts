@@ -1,13 +1,7 @@
-import {
-  handleTokenMiddleware,
-  redirectToDashboardMiddleware,
-  handleErrorMiddleware,
-} from "./middleware";
-
-export async function loginUser(credentials: {
-  email: string;
-  password: string;
-}) {
+export async function loginUser(
+  credentials: { email: string; password: string },
+  login: (token: string) => void
+) {
   try {
     const response = await fetch("/api/login", {
       method: "POST",
@@ -25,13 +19,12 @@ export async function loginUser(credentials: {
     const result = await response.json();
 
     if (result.token) {
-      handleTokenMiddleware(result.token);
-      redirectToDashboardMiddleware();
+      login(result.token);
     }
 
     return result;
   } catch (error) {
-    handleErrorMiddleware(error);
+    console.error("Error en login:", error);
     throw error;
   }
 }

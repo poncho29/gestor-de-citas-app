@@ -5,11 +5,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { registerUser } from "@/app/actions/registerUser";
-
 
 const registerSchema = z.object({
     name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
@@ -34,20 +32,28 @@ export default function RegisterForm() {
         formState: { errors, isSubmitting },
     } = useForm<RegisterFormInputs>({
         resolver: zodResolver(registerSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            phone: "",
+            password: "",
+        },
     });
 
     const router = useRouter();
 
     const onSubmit = async (data: RegisterFormInputs) => {
         try {
-            const result = await registerUser(data);
-            console.log("Registro exitoso:", result);
+            await registerUser(data, (token) => {
+                console.log("Token recibido:", token);
+            });
             reset();
             router.push("/login");
         } catch (error) {
             console.error("Error durante el registro:", error);
         }
     };
+
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -56,47 +62,30 @@ export default function RegisterForm() {
                 <div className="flex flex-col justify-center p-8 md:p-14">
                     <h2 className="mb-4 text-4xl font-bold">Crea una nueva cuenta</h2>
                     <p className="font-light text-gray-400 mb-8">Regístrate con tus datos</p>
+
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div>
-                            <label className="block text-md">Nombre</label>
-                            <Input
-                                {...register("name")}
-                                type="text"
-                                placeholder="Nombre"
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
-                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-md">Email</label>
-                            <Input
-                                {...register("email")}
-                                type="email"
-                                placeholder="Email"
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
-                            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-md">Teléfono</label>
-                            <Input
-                                {...register("phone")}
-                                type="tel"
-                                placeholder="10 dígitos"
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
-                            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-md">Contraseña</label>
-                            <Input
-                                {...register("password")}
-                                type="password"
-                                placeholder="******"
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                            />
-                            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-                        </div>
+                        {[
+                            { label: "Nombre", name: "name", type: "text", placeholder: "Tu nombre" },
+                            { label: "Email", name: "email", type: "email", placeholder: "tuemail@example.com" },
+                            { label: "Teléfono", name: "phone", type: "tel", placeholder: "10 dígitos" },
+                            { label: "Contraseña", name: "password", type: "password", placeholder: "******" },
+                        ].map(({ label, name, type, placeholder }) => (
+                            <div key={name}>
+                                <label className="block text-md">{label}</label>
+                                <Input
+                                    {...register(name as keyof RegisterFormInputs)}
+                                    type={type}
+                                    placeholder={placeholder}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                />
+                                {errors[name as keyof RegisterFormInputs] && (
+                                    <p className="text-red-500 text-xs mt-1">
+                                        {errors[name as keyof RegisterFormInputs]?.message}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+
                         <Button
                             type="submit"
                             disabled={isSubmitting}

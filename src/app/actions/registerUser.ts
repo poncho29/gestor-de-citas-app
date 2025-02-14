@@ -1,15 +1,7 @@
-import {
-  handleTokenMiddleware,
-  redirectToDashboardMiddleware,
-  handleErrorMiddleware,
-} from "./middleware";
-
-export async function registerUser(credentials: {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-}) {
+export async function registerUser(
+  credentials: { name: string; email: string; phone: string; password: string },
+  login: (token: string) => void
+) {
   try {
     const response = await fetch("/api/register", {
       method: "POST",
@@ -27,13 +19,12 @@ export async function registerUser(credentials: {
     const result = await response.json();
 
     if (result.token) {
-      handleTokenMiddleware(result.token);
-      redirectToDashboardMiddleware();
+      login(result.token);
     }
 
     return result;
   } catch (error) {
-    handleErrorMiddleware(error);
+    console.error("Error en el registro:", error);
     throw error;
   }
 }
