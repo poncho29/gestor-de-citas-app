@@ -4,12 +4,14 @@ import {
   handleErrorMiddleware,
 } from "./middleware";
 
-export async function loginUser(credentials: {
+export async function registerUser(credentials: {
+  name: string;
   email: string;
+  phone: string;
   password: string;
 }) {
   try {
-    const response = await fetch("/api/login", {
+    const response = await fetch("/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
