@@ -1,16 +1,16 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { loginUser } from "@/app/actions/auth/loginUser";
-import { useRouter } from "next/navigation";
 
-import Image from "next/image";
 import { useAuth } from "@/context/hook/useAuth";
-
+import { useState } from "react";
 
 const loginSchema = z.object({
     email: z.string().email("Por favor, ingresa un correo válido."),
@@ -20,26 +20,28 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+    const router = useRouter();
+    const { login } = useAuth();
+    const [error, setError] = useState<string | null>(null);
+
     const {
         register,
         handleSubmit,
-        reset,
         formState: { errors, isSubmitting },
     } = useForm<LoginFormInputs>({
         resolver: zodResolver(loginSchema),
     });
 
-    const router = useRouter();
-    const { login } = useAuth();
-
     const onSubmit = async (data: LoginFormInputs) => {
         try {
-            const result = await loginUser(data, login);
-            console.log("Respuesta del servidor:", result);
-            reset();
-            router.push("/dashboard");
+            await login(data);
+            // console.log("Respuesta del servidor:", result);
+            // reset();
+            // router.push("/dashboard");
         } catch (error) {
             console.error("Error durante el inicio de sesión:", error);
+            const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
+            setError(errorMessage);
         }
     };
 
@@ -103,6 +105,8 @@ export default function LoginForm() {
                                 "Iniciar sesión"
                             )}
                         </Button>
+
+                        {error && <p className="text-red-500 font-medium mt-4">{error}</p>}
                     </form>
 
                     <div className="mt-4 text-center">

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { registerUser } from "@/app/actions/auth/registerUser";
+import { registerUser } from "@/actions/auth/registerUser";
 
 const registerSchema = z.object({
     name: z.string().min(2, "El nombre debe tener al menos 2 caracteres."),
