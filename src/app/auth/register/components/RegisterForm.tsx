@@ -126,7 +126,7 @@ export default function RegisterForm() {
                         <Button
                             variant="outline"
                             className="w-full mt-2"
-                            onClick={() => router.push("/login")}
+                            onClick={() => router.push("/auth/login")}
                         >
                             Inicia sesión
                         </Button>
