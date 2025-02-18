@@ -1,22 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { useRouter } from "next/navigation";
-
 import { AuthContext } from "./AuthContext";
-
 import { loginAction } from "@/actions/auth/login-action";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
         const token = localStorage.getItem("jwt");
-        if (token) {
+        if (!token) {
+            router.replace("/auth/login");
+        } else {
             setUser(token);
         }
+        setLoading(false);
     }, []);
 
     const login = async ({ email, password }: { email: string; password: string }) => {
@@ -34,8 +35,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const logout = () => {
         localStorage.removeItem("jwt");
         setUser(null);
-        router.push("/login");
+        router.push("/auth/login");
     };
+
+    if (loading) return <div>Cargando...</div>;
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>

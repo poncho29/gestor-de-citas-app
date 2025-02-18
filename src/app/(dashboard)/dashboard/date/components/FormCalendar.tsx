@@ -64,7 +64,7 @@ export default function FormCalendar({ onSubmit, onCancel }: FormCalendarProps) 
                 />
             </div>
 
-            {/* Botones */}
+
             <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={onCancel}>
                     Cancelar
