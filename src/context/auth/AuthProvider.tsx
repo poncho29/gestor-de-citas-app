@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { AuthContext } from "./AuthContext";
+
 import { loginAction } from "@/actions/auth/login-action";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
