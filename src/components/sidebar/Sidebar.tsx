@@ -4,12 +4,14 @@ import React, { useState } from 'react'
 
 import Image from 'next/image'
 
-import { FiUsers } from 'react-icons/fi'
+
 import { IoSearchOutline } from 'react-icons/io5'
 import { AiOutlineLogout } from 'react-icons/ai'
 import { FaBars } from 'react-icons/fa'
 
 import SidebarLink from './SidebarLinks'
+
+import { BiCalendar } from 'react-icons/bi'
 
 
 export default function Sidebar() {
@@ -58,8 +60,9 @@ export default function Sidebar() {
 
 
                     <div className="flex flex-col">
-                        <SidebarLink href="#" text="Users" icon={<FiUsers />} />
+                        <SidebarLink href="/dashboard/date" text="Citas" icon={<BiCalendar />} />
                     </div>
+
                 </div>
 
 
