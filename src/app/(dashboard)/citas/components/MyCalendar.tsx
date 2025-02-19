@@ -19,15 +19,16 @@ const FullCalendar = dynamic(() => import('@fullcalendar/react'), { ssr: false }
 
 const getRandomColor = () => {
     const colors = [
-        'border-red-500',
-        'border-blue-500',
-        'border-green-500',
-        'border-yellow-500',
-        'border-purple-500',
-        'border-pink-500'
+        { bgColor: 'bg-red-100', textColor: 'text-red-600', borderColor: '#DC2626' },
+        { bgColor: 'bg-blue-100', textColor: 'text-blue-600', borderColor: '#2563EB' },
+        { bgColor: 'bg-green-100', textColor: 'text-green-600', borderColor: '#16A34A' },
+        { bgColor: 'bg-yellow-100', textColor: 'text-yellow-600', borderColor: '#CA8A04' },
+        { bgColor: 'bg-purple-100', textColor: 'text-purple-600', borderColor: '#7C3AED' },
+        { bgColor: 'bg-pink-100', textColor: 'text-pink-600', borderColor: '#DB2777' }
     ];
     return colors[Math.floor(Math.random() * colors.length)];
 };
+
 
 export default function MyCalendar() {
     const [events, setEvents] = useState<FormData[]>([
@@ -67,13 +68,18 @@ export default function MyCalendar() {
                 locale={esLocale}
                 contentHeight="75vh"
                 slotMinWidth={80}
-                eventContent={(eventInfo) => (
-                    <div
-                        className={`text-black bg-transparent border ${getRandomColor()} rounded-lg px-4 py-2 text-sm shadow-sm w-full h-full flex justify-center items-center mb-1`}
-                    >
-                        <span className="font-bold">{eventInfo.timeText}</span> - {eventInfo.event.title}
-                    </div>
-                )}
+                eventContent={(eventInfo) => {
+                    const { bgColor, textColor, borderColor } = getRandomColor();
+                    return (
+                        <div
+                            className={`rounded-md px-4 py-2 text-sm shadow-sm w-full h-full flex justify-center items-center mb-1 ${bgColor} ${textColor} border-l-8`}
+                            style={{ borderLeftColor: borderColor }}
+                        >
+                            <span className="font-bold">{eventInfo.timeText}</span> - {eventInfo.event.title}
+                        </div>
+                    );
+                }}
+
                 slotLabelFormat={{
                     hour: '2-digit',
                     minute: '2-digit',
