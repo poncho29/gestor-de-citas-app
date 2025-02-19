@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const token = localStorage.getItem("jwt");
         if (!token) {
-            router.replace("/auth/login");
+            router.replace("/citas");
         } else {
             setUser(token);
         }
