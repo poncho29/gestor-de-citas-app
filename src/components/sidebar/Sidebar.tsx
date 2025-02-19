@@ -4,21 +4,21 @@ import React, { useState } from 'react'
 
 import Image from 'next/image'
 
-
+import { MdOutlineHomeRepairService } from "react-icons/md";
 import { IoSearchOutline } from 'react-icons/io5'
+import { FaBars, FaUsers } from 'react-icons/fa'
 import { AiOutlineLogout } from 'react-icons/ai'
-import { FaBars } from 'react-icons/fa'
+import { BiCalendar } from 'react-icons/bi'
 
 import SidebarLink from './SidebarLinks'
 
-import { BiCalendar } from 'react-icons/bi'
-
-
 export default function Sidebar() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen)
     }
+
     return (
         <div className="h-full ">
             <div className="md:hidden p-4">
@@ -27,8 +27,10 @@ export default function Sidebar() {
                 </button>
             </div>
             <div
-                className={`h-screen md:block shadow-xl px-3 w-30 md:w-60 lg:w-60 overflow-x-hidden transition-transform duration-300 ease-in-out flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    } md:translate-x-0`}
+                className={`
+                    h-screen md:block shadow-xl px-3 w-30 md:w-60 lg:w-60 overflow-x-hidden transition-transform duration-300 
+                    ease-in-out flex flex-col md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+                `}
             >
                 <div className="space-y-3 mt-5">
                     <div id="profile" className="space-y-3 text-center">
@@ -59,10 +61,11 @@ export default function Sidebar() {
                     </div>
 
 
-                    <div className="flex flex-col">
-                        <SidebarLink href="/dashboard/date" text="Citas" icon={<BiCalendar />} />
+                    <div className="flex flex-col gap-1">
+                        <SidebarLink href="/citas" text="Citas" icon={<BiCalendar />} />
+                        <SidebarLink href="/servicios" text="Servicios" icon={<MdOutlineHomeRepairService />} />
+                        <SidebarLink href="/usuarios" text="Usuarios" icon={<FaUsers />} />
                     </div>
-
                 </div>
 
 
