@@ -4,16 +4,22 @@ import React, { useState } from 'react'
 
 import Image from 'next/image'
 
-import { MdOutlineHomeRepairService } from "react-icons/md";
+import { useAuth } from '@/context/hook/useAuth';
+
+import SidebarLink from './SidebarLinks'
+
+import { MdOutlineHomeRepairService, MdOutlineBusinessCenter } from "react-icons/md";
 import { IoSearchOutline } from 'react-icons/io5'
 import { FaBars, FaUsers } from 'react-icons/fa'
 import { AiOutlineLogout } from 'react-icons/ai'
 import { BiCalendar } from 'react-icons/bi'
 
-import SidebarLink from './SidebarLinks'
-
 export default function Sidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const { user, logout } = useAuth();
+
+    console.log(user)
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen)
@@ -65,6 +71,7 @@ export default function Sidebar() {
                         <SidebarLink href="/citas" text="Citas" icon={<BiCalendar />} />
                         <SidebarLink href="/servicios" text="Servicios" icon={<MdOutlineHomeRepairService />} />
                         <SidebarLink href="/usuarios" text="Usuarios" icon={<FaUsers />} />
+                        <SidebarLink href="/empresas" text="Empresas" icon={<MdOutlineBusinessCenter />} />
                     </div>
                 </div>
 
@@ -73,6 +80,7 @@ export default function Sidebar() {
                     <button
                         className="text-sm flex items-center font-medium text-gray-700 py-2 px-3 hover:text-red-500 hover:scale-105 rounded-md transition duration-150 ease-in-out w-full"
                         aria-label="Logout"
+                        onClick={logout}
                     >
                         <AiOutlineLogout className="mr-2" />
                         <span>Cerrar Sesión</span>

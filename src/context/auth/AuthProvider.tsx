@@ -9,9 +9,10 @@ import { AuthContext } from "./AuthContext";
 import { loginAction } from "@/actions/auth/login-action";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const router = useRouter();
+    
     const [user, setUser] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
 
     useEffect(() => {
         const token = localStorage.getItem("jwt");
@@ -21,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser(token);
         }
         setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const login = async ({ email, password }: { email: string; password: string }) => {
