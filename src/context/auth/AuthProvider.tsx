@@ -6,47 +6,74 @@ import { useRouter } from "next/navigation";
 
 import { AuthContext } from "./AuthContext";
 
-import { loginAction } from "@/actions/auth/login-action";
+import { validateSessionAction } from "@/actions";
+
+import { removeSession } from "@/utils/auth";
+
+import { User } from "@/interfaces";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     
-    const [user, setUser] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("jwt");
-        if (!token) {
-            router.replace("/citas");
-        } else {
-            setUser(token);
-        }
-        setLoading(false);
+        if (user) return; 
+
+        console.log('Validating session...');
+        const validateSession = async () => {
+            try {
+                const { success, user } = await validateSessionAction();
+                
+                if (success && user) {
+                    setUser(user);
+                } else {
+                    logoutCtx();
+                }
+            } catch (error) {
+                console.error('Error validating session:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        validateSession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const login = async ({ email, password }: { email: string; password: string }) => {
-        const response = await loginAction({ email, password });
+    const loginCtx = (user: User | null) => {
+        setUser(user);
+        router.push("/citas");
+    }
 
-        if (response && response.success) {
-            localStorage.setItem("jwt", response.user.token);
-            setUser(response.user.id);
-            router.push("/dashboard");
-        } else {
-            throw new Error(response.message);
-        }
-    };
+    // const login = async ({ email, password }: { email: string; password: string }) => {
+    //     const response = await loginAction({ email, password });
 
-    const logout = () => {
-        localStorage.removeItem("jwt");
+    //     if (response && response.success) {
+    //         localStorage.setItem("jwt", response.user.token);
+    //         setUser(response.user.id);
+    //         router.push("/dashboard");
+    //     } else {
+    //         throw new Error(response.message);
+    //     }
+    // };
+
+    const logoutCtx = () => {
+        removeSession();
         setUser(null);
         router.push("/auth/login");
     };
 
-    if (loading) return <div>Cargando...</div>;
-
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                isloadingCtx: isLoading,
+                loginCtx,
+                logoutCtx
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
