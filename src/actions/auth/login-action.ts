@@ -1,8 +1,8 @@
 'use server';
 
-import { COOKIE_NAME, createSession, isSessionValid } from "@/utils/auth";
+import { COOKIE_NAME, createSession, isSessionValid } from "@/utils";
 
-import { Roles, User } from "@/interfaces";
+import { User, Result } from "@/interfaces";
 
 const URL = process.env.URL_BASE;
 
@@ -29,7 +29,8 @@ export async function loginAction(
 
     return { success: true, user, message: 'Inicio de sesión exitoso' };
   } catch (error) {
-    let errorMessage = typeof error === 'string' ? error : 'Error al iniciar sesión';
+    console.log('login action error |', error);
+    let errorMessage = 'Error al iniciar sesión';
 
     if (error instanceof Error) {
       errorMessage = error.message;
@@ -44,32 +45,35 @@ export async function loginAction(
   }
 }
 
-export async function validateSessionAction(): Promise<{ success: boolean; user: User | null }> {
+export async function validateTokenAction(): Promise<Result<User>> {
   try {
-    const token = isSessionValid(COOKIE_NAME);
+    const token = await isSessionValid();
 
     if (!token) {
-      throw new Error("La sesión expiró");
+      throw new Error("No hay un token válido");
     }
 
     // Si existe un token válido, realiza una solicitud para validar la sesión
-    // TODO: crear endpoint de validación de sesión que regrese el usuario
+    const response = await fetch(`${URL}/auth/validate-token`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    // if (!response.ok) {
-    //   return { success: false, user: null };
-    // }
-
-    // const user = await response.json();
-    const user: User = {
-      id: '1',
-      email: '5aGtD@example.com',
-      roles: [Roles.SUPER_ADMIN],
-      token
+    if (!response.ok) {
+      throw new Error("Error al validar la sesión");
     }
 
-    return { success: true, user };
+    const user: User = await response.json();
+    createSession(user.token);
+
+    return { ok: true, data: user, error: null };
   } catch (error) {
-    console.error("Error al validar la sesión:", error);
-    return { success: false, user: null };
+    console.log('validate token action error |', error);
+    const errorMessage = "Error al validar la sesión";
+
+    return { ok: false, data: null, error: errorMessage };
   }
 }

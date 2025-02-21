@@ -40,16 +40,6 @@ export default function LoginForm() {
         if (!success) setError(message);
 
         loginCtx(user);
-        // try {
-        //     const { success, user } = await loginAction(data);
-        //     if (success) {
-        //         loginContext(user);
-        //     }
-        // } catch (error) {
-        //     console.error("Error durante el inicio de sesión:", error);
-        //     const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
-        //     setError(errorMessage);
-        // }
     };
 
     return (

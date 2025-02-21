@@ -2,20 +2,50 @@
 
 import { cookies } from "next/headers";
 
-export const COOKIE_NAME = "__GDC__SESSION__";
+import { COOKIE_NAME } from "./api";
 
-export function isSessionValid(cookie: string | undefined | null): string | undefined {
-  if (!cookie) return undefined;
+// import { validateTokenAction } from "@/actions";
 
-  const _cookies = cookies();
-  return _cookies.get(COOKIE_NAME)?.value;
+export async function isSessionValid() {
+  if (!COOKIE_NAME) return undefined;
+
+  const cookieSession = cookies().get(COOKIE_NAME)?.value;
+
+  if (!cookieSession) return undefined;
+
+  const { token, createTime } = JSON.parse(cookieSession);
+  
+  const oneHourInMilliseconds = 1 * 60 * 60 * 1000;
+  const fiftyMinutesInMilliseconds = 50 * 60 * 1000;
+  const totalMillisecondsToAdd = oneHourInMilliseconds + fiftyMinutesInMilliseconds;
+
+  console.log('validando sesion')
+  if (Date.now() < createTime + totalMillisecondsToAdd) {
+    return token;
+  } else {
+    return undefined;
+    // const { ok, data } = await validateTokenAction();
+
+    // if (ok && data) {
+    //   await createSession(data.token);
+    //   return data.token;
+    // } else {
+    //   return undefined;
+    // }
+  }  
 }
 
-export function createSession(token: string) {
-  const expireAt = new Date(Date.now() + 86400 * 1000);
+export async function createSession(token: string) {
+  const expireAt = new Date(Date.now() + 7200 * 1000); // 2h
+  const createTimeCookie = Date.now();
   const _cookies = cookies();
 
-  _cookies.set(COOKIE_NAME, token, {
+  const dataCookie = {
+    token,
+    createTime: createTimeCookie
+  }
+
+  _cookies.set(COOKIE_NAME, JSON.stringify(dataCookie), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
@@ -24,7 +54,7 @@ export function createSession(token: string) {
   });
 }
 
-export function removeSession() {
+export async function removeSession() {
   const cookieStore = cookies();
   cookieStore.delete(COOKIE_NAME);
 }
