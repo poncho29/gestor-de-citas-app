@@ -26,9 +26,12 @@ export default function Sidebar() {
     }
 
     return (
-        <div className="h-full ">
-            <div className="md:hidden p-4">
-                <button onClick={toggleSidebar} className="text-gray-700">
+        <div className="h-full md:h-0">
+            <div className="lg:hidden flex p-4">
+                <button
+                    onClick={toggleSidebar}
+                    className="text-gray-700 lg:w-auto w-10 h-10 flex items-center justify-center"
+                >
                     <FaBars size={24} />
                 </button>
             </div>
