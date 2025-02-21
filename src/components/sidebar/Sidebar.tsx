@@ -1,45 +1,25 @@
 'use client'
 
-import React, { useState } from 'react'
-
-import Image from 'next/image'
-
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/hook/useAuth';
+import SidebarLink from './SidebarLinks';
 
-import SidebarLink from './SidebarLinks'
-
-import { MdOutlineHomeRepairService, MdOutlineBusinessCenter } from "react-icons/md";
-import { IoSearchOutline } from 'react-icons/io5'
-import { FaBars, FaUsers } from 'react-icons/fa'
-import { AiOutlineLogout } from 'react-icons/ai'
-import { BiCalendar } from 'react-icons/bi'
+import { AiOutlineHome, AiOutlineSearch, AiOutlineMenu, AiOutlineUser, AiOutlineCalendar, AiOutlineLogout, AiOutlineBank } from "react-icons/ai";
 
 export default function Sidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
     const { user, logout } = useAuth();
 
-    console.log(user)
-
     const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen)
-    }
+        setIsSidebarOpen(!isSidebarOpen);
+    };
 
     return (
-        <div className="h-full md:h-0">
-            <div className="lg:hidden flex p-4">
-                <button
-                    onClick={toggleSidebar}
-                    className="text-gray-700 lg:w-auto w-10 h-10 flex items-center justify-center"
-                >
-                    <FaBars size={24} />
-                </button>
-            </div>
+        <>
             <div
-                className={`
-                    h-screen md:block shadow-xl px-3 w-30 md:w-60 lg:w-60 overflow-x-hidden transition-transform duration-300 
-                    ease-in-out flex flex-col md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-                `}
+                className={`fixed lg:relative h-screen shadow-xl px-3 w-60 overflow-x-hidden transition-transform duration-300 ease-in-out
+                bg-white z-50 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
             >
                 <div className="space-y-3 mt-5">
                     <div id="profile" className="space-y-3 text-center">
@@ -51,9 +31,7 @@ export default function Sidebar() {
                             className="w-20 h-20 rounded-full mx-auto"
                         />
                         <div>
-                            <h2 className="font-medium text-xs md:text-sm text-blue-500">
-                                Sebas
-                            </h2>
+                            <h2 className="font-medium text-xs md:text-sm text-blue-500">Sebas</h2>
                             <p className="text-xs text-gray-500">Administrador</p>
                         </div>
                     </div>
@@ -62,22 +40,20 @@ export default function Sidebar() {
                         <input
                             type="text"
                             className="w-full rounded-tl-md rounded-bl-md px-2 py-3 text-sm focus:outline-none text-gray-600 md:mr-2"
-                            placeholder="Search"
+                            placeholder="Buscar..."
                         />
                         <button className="rounded-tr-md rounded-br-md px-2 hidden md:block">
-                            <IoSearchOutline />
+                            <AiOutlineSearch />
                         </button>
                     </div>
 
-
                     <div className="flex flex-col gap-1">
-                        <SidebarLink href="/citas" text="Citas" icon={<BiCalendar />} />
-                        <SidebarLink href="/servicios" text="Servicios" icon={<MdOutlineHomeRepairService />} />
-                        <SidebarLink href="/usuarios" text="Usuarios" icon={<FaUsers />} />
-                        <SidebarLink href="/empresas" text="Empresas" icon={<MdOutlineBusinessCenter />} />
+                        <SidebarLink href="/citas" text="Citas" icon={<AiOutlineCalendar />} />
+                        <SidebarLink href="/servicios" text="Servicios" icon={<AiOutlineHome />} />
+                        <SidebarLink href="/usuarios" text="Usuarios" icon={<AiOutlineUser />} />
+                        <SidebarLink href="/empresas" text="Empresas" icon={<AiOutlineBank />} />
                     </div>
                 </div>
-
 
                 <div className="absolute bottom-3 w-full">
                     <button
@@ -90,6 +66,22 @@ export default function Sidebar() {
                     </button>
                 </div>
             </div>
-        </div>
-    )
+
+            <div className="lg:hidden fixed top-4 left-4 z-50">
+                <button
+                    onClick={toggleSidebar}
+                    className="text-gray-700 w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md"
+                >
+                    <AiOutlineMenu size={24} />
+                </button>
+            </div>
+
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 lg:hidden"
+                    onClick={toggleSidebar}
+                ></div>
+            )}
+        </>
+    );
 }

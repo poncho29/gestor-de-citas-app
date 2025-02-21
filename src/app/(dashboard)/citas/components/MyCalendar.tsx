@@ -9,11 +9,9 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AiOutlinePlus } from 'react-icons/ai';
-
 import { FormData } from './FormCalendar';
-
 import "./styles/myCalendar.css";
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const FullCalendar = dynamic(() => import('@fullcalendar/react'), { ssr: false });
 
@@ -29,7 +27,6 @@ const getRandomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
 };
 
-
 export default function MyCalendar() {
     const [events, setEvents] = useState<FormData[]>([
         {
@@ -40,14 +37,7 @@ export default function MyCalendar() {
     ]);
 
     const handleEventSubmit = (data: FormData) => {
-        setEvents((prevEvents) => [
-            ...prevEvents,
-            {
-                title: data.title,
-                start: data.start,
-                end: data.end,
-            },
-        ]);
+        setEvents((prevEvents) => [...prevEvents, { ...data }]);
     };
 
     const handleCancel = () => {
@@ -55,41 +45,8 @@ export default function MyCalendar() {
     };
 
     return (
-        <div className="w-full h-full mx-auto capitalize p-6 bg-white">
-            <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin]}
-                initialView="dayGridMonth"
-                events={events}
-                headerToolbar={{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay',
-                }}
-                locale={esLocale}
-                contentHeight="75vh"
-                slotMinWidth={80}
-                eventContent={(eventInfo) => {
-                    const { bgColor, textColor, borderColor } = getRandomColor();
-                    return (
-                        <div
-                            className={`rounded-md px-4 py-2 text-sm shadow-sm w-full h-full flex justify-center items-center mb-1 ${bgColor} ${textColor} border-l-8`}
-                            style={{ borderLeftColor: borderColor }}
-                        >
-                            <span className="font-bold">{eventInfo.timeText}</span> - {eventInfo.event.title}
-                        </div>
-                    );
-                }}
-
-                slotLabelFormat={{
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true,
-                }}
-                slotDuration="00:30:00"
-                dayCellClassNames="border border-gray-200"
-            />
-
-            <div className="flex justify-end mt-4">
+        <div className="w-full h-screen p-4 flex flex-col">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-200 flex items-center gap-2 px-4 py-2 rounded-lg">
@@ -104,6 +61,48 @@ export default function MyCalendar() {
                         <FormCalendar onSubmit={handleEventSubmit} onCancel={handleCancel} />
                     </DialogContent>
                 </Dialog>
+            </div>
+            <div className="w-full flex-grow h-[85vh] overflow-hidden">
+                <FullCalendar
+                    plugins={[dayGridPlugin, timeGridPlugin]}
+                    initialView="dayGridMonth"
+                    events={events}
+                    headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                    }}
+                    locale={esLocale}
+                    height="100%"
+                    contentHeight="auto"
+                    eventContent={(eventInfo) => {
+                        const { bgColor, textColor, borderColor } = getRandomColor();
+                        return (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div
+                                            className={`rounded-md px-2 py-1 text-xs sm:text-sm shadow-sm flex items-center border-l-4 ${bgColor} ${textColor} overflow-hidden text-ellipsis whitespace-nowrap`}
+                                            style={{ borderLeftColor: borderColor, maxWidth: '100%' }}
+                                        >
+                                            <span className="font-bold">{eventInfo.timeText}</span> - {eventInfo.event.title}
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="bg-gray-800 text-white p-2 rounded-md shadow-lg">
+                                        {eventInfo.event.title}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        );
+                    }}
+                    slotLabelFormat={{
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                    }}
+                    slotDuration="00:30:00"
+                    dayCellClassNames="border border-gray-200"
+                />
             </div>
         </div>
     );

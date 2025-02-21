@@ -1,3 +1,33 @@
+@media (max-width: 768px) {
+    .fc-toolbar-chunk {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 4px !important;
+    }
+
+    .fc-button-group {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 4px !important;
+    }
+
+    .fc-button {
+        padding: 6px 8px !important;
+        font-size: 0.875rem !important;
+    }
+
+    .fc-daygrid-day-number {
+        font-size: 0.75rem !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.25rem !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+}
+
 .fc-event {
     background-color: transparent !important;
     border: none !important;
@@ -54,4 +84,30 @@
 
 .fc-button-active {
     background-color: #e5e7eb !important;
+}
+
+.fc-toolbar-title {
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    text-transform: capitalize !important;
+    text-align: center !important;
+    flex-grow: 1 !important;
+}
+
+
+.fc-scroller {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: 70vh !important;
+}
+
+.fc-timegrid-container {
+    height: auto !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.fc-timegrid-slot {
+    min-height: 40px !important;
 }
