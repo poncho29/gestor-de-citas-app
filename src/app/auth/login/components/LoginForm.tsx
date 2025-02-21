@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -10,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/context/hook/useAuth";
-import { useState } from "react";
+import { loginAction } from "@/actions";
 
 const loginSchema = z.object({
     email: z.string().email("Por favor, ingresa un correo válido."),
@@ -21,7 +23,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { loginCtx } = useAuth();
     const [error, setError] = useState<string | null>(null);
 
     const {
@@ -33,16 +35,11 @@ export default function LoginForm() {
     });
 
     const onSubmit = async (data: LoginFormInputs) => {
-        try {
-            await login(data);
-            // console.log("Respuesta del servidor:", result);
-            // reset();
-            // router.push("/dashboard");
-        } catch (error) {
-            console.error("Error durante el inicio de sesión:", error);
-            const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
-            setError(errorMessage);
-        }
+        const { success, user, message } = await loginAction(data);
+        
+        if (!success) setError(message);
+
+        loginCtx(user);
     };
 
     return (

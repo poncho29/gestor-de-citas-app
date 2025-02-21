@@ -1,15 +1,19 @@
 'use client'
 
 import React, { useState } from 'react';
+
 import Image from 'next/image';
+
 import { useAuth } from '@/context/hook/useAuth';
+
 import SidebarLink from './SidebarLinks';
 
 import { AiOutlineHome, AiOutlineSearch, AiOutlineMenu, AiOutlineUser, AiOutlineCalendar, AiOutlineLogout, AiOutlineBank } from "react-icons/ai";
 
 export default function Sidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { user, logout } = useAuth();
+
+    const { user, logoutCtx } = useAuth();
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -31,8 +35,10 @@ export default function Sidebar() {
                             className="w-20 h-20 rounded-full mx-auto"
                         />
                         <div>
-                            <h2 className="font-medium text-xs md:text-sm text-blue-500">Sebas</h2>
-                            <p className="text-xs text-gray-500">Administrador</p>
+                            <h2 className="font-medium text-xs md:text-sm text-blue-500">
+                                {user && user?.name}
+                            </h2>
+                            <p className="text-xs text-gray-500">{user && user?.roles[0]}</p>
                         </div>
                     </div>
 
@@ -48,10 +54,10 @@ export default function Sidebar() {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <SidebarLink href="/citas" text="Citas" icon={<AiOutlineCalendar />} />
-                        <SidebarLink href="/servicios" text="Servicios" icon={<AiOutlineHome />} />
-                        <SidebarLink href="/usuarios" text="Usuarios" icon={<AiOutlineUser />} />
-                        <SidebarLink href="/empresas" text="Empresas" icon={<AiOutlineBank />} />
+                        <SidebarLink href="/dashboard/citas" text="Citas" icon={<AiOutlineCalendar />} />
+                        <SidebarLink href="/dashboard/servicios" text="Servicios" icon={<AiOutlineHome />} />
+                        <SidebarLink href="/dashboard/usuarios" text="Usuarios" icon={<AiOutlineUser />} />
+                        <SidebarLink href="/dashboard/empresas" text="Empresas" icon={<AiOutlineBank />} />
                     </div>
                 </div>
 
@@ -59,7 +65,7 @@ export default function Sidebar() {
                     <button
                         className="text-sm flex items-center font-medium text-gray-700 py-2 px-3 hover:text-red-500 hover:scale-105 rounded-md transition duration-150 ease-in-out w-full"
                         aria-label="Logout"
-                        onClick={logout}
+                        onClick={logoutCtx}
                     >
                         <AiOutlineLogout className="mr-2" />
                         <span>Cerrar Sesión</span>

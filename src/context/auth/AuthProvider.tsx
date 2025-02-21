@@ -6,47 +6,60 @@ import { useRouter } from "next/navigation";
 
 import { AuthContext } from "./AuthContext";
 
-import { loginAction } from "@/actions/auth/login-action";
+import { validateTokenAction } from "@/actions";
+
+import { removeSession } from "@/utils/auth";
+
+import { User } from "@/interfaces";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
+    // const pathname = usePathname();
     
-    const [user, setUser] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("jwt");
-        if (!token) {
-            router.replace("/citas");
-        } else {
-            setUser(token);
+        if (!user && !isLoading) {
+            const validateSession = async () => {
+                console.log('Obtener usuario de nuevo revalidando token');
+                setIsLoading(true);
+                const { ok, data, error } = await validateTokenAction();
+        
+                if (ok && data) {
+                    setUser(data);
+                    setIsLoading(false);
+                } else {
+                    console.error("Error validating session:", error);
+                    await logoutCtx();
+                    setIsLoading(false);
+                }
+            };
+
+            validateSession();
         }
-        setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [user]);
 
-    const login = async ({ email, password }: { email: string; password: string }) => {
-        const response = await loginAction({ email, password });
+    const loginCtx = (user: User | null) => {
+        setUser(user);
+        router.push("/dashboard/citas");
+    }
 
-        if (response && response.success) {
-            localStorage.setItem("jwt", response.user.token);
-            setUser(response.user.id);
-            router.push("/dashboard");
-        } else {
-            throw new Error(response.message);
-        }
-    };
-
-    const logout = () => {
-        localStorage.removeItem("jwt");
+    const logoutCtx = async () => {
+        await removeSession();
         setUser(null);
         router.push("/auth/login");
     };
 
-    if (loading) return <div>Cargando...</div>;
-
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                isloadingCtx: isLoading,
+                loginCtx,
+                logoutCtx
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
