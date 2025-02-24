@@ -24,12 +24,10 @@ export async function createService(
   try {
     console.log("Iniciando creación de servicio...");
 
-    // Verificar si la URL base está definida
     console.log("URL de la API:", URL);
     if (!URL)
       throw new Error("La variable de entorno URL_BASE no está definida.");
 
-    // Obtener la cookie de autenticación
     const cookieValue = cookies().get(COOKIE_NAME)?.value;
     console.log("Valor de la cookie:", cookieValue);
 
