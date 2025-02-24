@@ -14,7 +14,7 @@ const serviceSchema = z.object({
   duration: z
     .number({ invalid_type_error: "Debe ser un número" })
     .min(15, "La duración mínima es 15 min")
-    .max(1440, "La duración máxima es 1440 min"),
+    .max(120, "La duración máxima es 120 min"),
   price: z
     .number({ invalid_type_error: "Debe ser un número" })
     .min(10000, "El precio mínimo es 10,000"),
