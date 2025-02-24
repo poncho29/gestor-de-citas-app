@@ -12,27 +12,28 @@ import { removeSession } from "@/utils/auth";
 
 import { User } from "@/interfaces";
 
+import { isSessionValid } from '@/utils';
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const pathname = usePathname();
     
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLogout, setIsLogout] = useState(false);
 
     useEffect(() => {
         if (!pathname.startsWith("/dashboard")) return;
 
-        if (!user && !isLoading) {
+        if (!user && !isLoading && !isLogout) {
             const validateSession = async () => {
-                console.log('Obtener usuario de nuevo revalidando token');
                 setIsLoading(true);
-                const { ok, data, error } = await validateTokenAction();
+                const { ok, data } = await validateTokenAction();
         
                 if (ok && data) {
                     setUser(data);
                     setIsLoading(false);
                 } else {
-                    console.error("Error validating session:", error);
                     await logoutCtx();
                     setIsLoading(false);
                 }
@@ -41,11 +42,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             validateSession();
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user, isLoading, pathname]);
+    }, [user]);
+
+    useEffect(() => {
+        if (!pathname.startsWith("/dashboard")) return;
+
+        const checkSession = async () => {
+            const token = await isSessionValid();
+
+            if (!token ) await logoutCtx();
+        };
+
+        checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname]);
 
     const loginCtx = (user: User | null) => {
+        setIsLogout(true);
         setUser(user);
         router.push("/dashboard/citas");
+        setIsLogout(false);
     }
 
     const logoutCtx = async () => {

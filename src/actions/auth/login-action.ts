@@ -60,6 +60,7 @@ export async function validateTokenAction(): Promise<Result<User>> {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      cache: "no-cache",
     });
 
     if (!response.ok) {
