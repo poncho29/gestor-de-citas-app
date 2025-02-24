@@ -4,8 +4,6 @@ import { cookies } from "next/headers";
 
 import { COOKIE_NAME } from "./api";
 
-// import { validateTokenAction } from "@/actions";
-
 export async function isSessionValid() {
   if (!COOKIE_NAME) return undefined;
 
@@ -19,19 +17,10 @@ export async function isSessionValid() {
   const fiftyMinutesInMilliseconds = 50 * 60 * 1000;
   const totalMillisecondsToAdd = oneHourInMilliseconds + fiftyMinutesInMilliseconds;
 
-  console.log('validando sesion')
   if (Date.now() < createTime + totalMillisecondsToAdd) {
     return token;
   } else {
     return undefined;
-    // const { ok, data } = await validateTokenAction();
-
-    // if (ok && data) {
-    //   await createSession(data.token);
-    //   return data.token;
-    // } else {
-    //   return undefined;
-    // }
   }  
 }
 
