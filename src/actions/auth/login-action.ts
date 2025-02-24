@@ -1,6 +1,6 @@
 'use server';
 
-import { COOKIE_NAME, createSession, isSessionValid } from "@/utils";
+import { createSession, isSessionValid } from "@/utils";
 
 import { User, Result } from "@/interfaces";
 

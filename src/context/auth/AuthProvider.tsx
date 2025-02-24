@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { AuthContext } from "./AuthContext";
 
@@ -14,12 +14,14 @@ import { User } from "@/interfaces";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
-    // const pathname = usePathname();
+    const pathname = usePathname();
     
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        if (!pathname.startsWith("/dashboard")) return;
+
         if (!user && !isLoading) {
             const validateSession = async () => {
                 console.log('Obtener usuario de nuevo revalidando token');
@@ -38,7 +40,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             validateSession();
         }
-    }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, isLoading, pathname]);
 
     const loginCtx = (user: User | null) => {
         setUser(user);
