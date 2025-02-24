@@ -1,8 +1,12 @@
+import { getServices } from "@/actions/services/getServices-action";
+import { SimplifiedService } from "@/interfaces/services.interfaces";
+import Table from "./components/Table";
 
-export default function ServicePage() {
+export default async function Page() {
+  const services: SimplifiedService[] = await getServices(10, 0);
   return (
     <div>
-      <h1>Service Page</h1>
+      <Table services={services} />
     </div>
   );
 }

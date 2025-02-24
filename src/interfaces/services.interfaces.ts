@@ -1,8 +1,8 @@
 export interface ServiceResponse {
   name: string;
   description: string;
-  duration: string;
-  price: string;
+  duration: number;
+  price: number;
   user_id: string;
   enterprise: null | string;
   id: string;
@@ -12,8 +12,9 @@ export interface ServiceResponse {
 }
 
 export interface SimplifiedService {
+  id: string;
   name: string;
   description: string;
-  duration: string;
-  price: string;
+  duration: number;
+  price: number;
 }

@@ -1,5 +1,4 @@
 "use server";
-
 import { cookies } from "next/headers";
 import { COOKIE_NAME } from "@/utils/api";
 import {
@@ -19,13 +18,9 @@ function mapService(response: ServiceResponse): SimplifiedService {
   };
 }
 
-export async function getServices(
-  limit: number = 10,
-  offset: number = 0
-): Promise<SimplifiedService[]> {
+export async function getServiceById(id: string): Promise<SimplifiedService> {
   try {
-    const cookieStore = cookies();
-    const cookieValue = cookieStore.get(COOKIE_NAME)?.value;
+    const cookieValue = cookies().get(COOKIE_NAME)?.value;
 
     if (!cookieValue)
       throw new Error("No se encontró la cookie de autenticación");
@@ -42,16 +37,13 @@ export async function getServices(
     if (!token)
       throw new Error("No se encontró el token de autenticación en la cookie");
 
-    const response = await fetch(
-      `${URL}/services?limit=${limit}&offset=${offset}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`${URL}/services/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       const errorMessage = await response.text();
@@ -59,18 +51,11 @@ export async function getServices(
     }
 
     const data = await response.json();
-    console.log("Datos recibidos del backend:", data);
+    console.log("Servicio recibido del backend:", data);
 
-    const services = Array.isArray(data) ? data : data?.services;
-
-    if (!Array.isArray(services)) {
-      console.error("La API no devolvió una lista de servicios:", data);
-      throw new Error("Formato de respuesta inválido");
-    }
-
-    return services.map(mapService);
+    return mapService(data);
   } catch (error) {
-    console.error("Error al obtener los servicios:", error);
+    console.error("Error al obtener el servicio:", error);
     throw error;
   }
 }
