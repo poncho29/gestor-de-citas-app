@@ -6,7 +6,7 @@ import { SimplifiedService } from "../../../../interfaces/services.interfaces";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const serviceSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
@@ -55,18 +55,48 @@ export default function ServiceForm({
     },
   });
 
+  const [formattedPrice, setFormattedPrice] = useState("");
+  const [formattedDuration, setFormattedDuration] = useState("");
+
+  // Función para formatear el precio a pesos colombianos
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(value);
+  };
+
+
+  const formatDuration = (minutes: number) => {
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+    }
+    return `${minutes} min`;
+  };
 
   useEffect(() => {
     if (initialData) {
       Object.entries(initialData).forEach(([key, value]) => {
         setValue(key as keyof ServiceFormValues, value as ServiceFormValues[keyof ServiceFormValues]);
       });
+
+      if (initialData.price) {
+        setFormattedPrice(formatCurrency(initialData.price));
+      }
+      if (initialData.duration) {
+        setFormattedDuration(formatDuration(initialData.duration));
+      }
     }
   }, [initialData, setValue]);
 
   const onSubmitHandler = (data: ServiceFormValues) => {
     onSubmit(data);
     reset();
+    setFormattedPrice("");
+    setFormattedDuration("");
   };
 
   return (
@@ -85,11 +115,23 @@ export default function ServiceForm({
             {errors.description && <p className="text-red-500">{errors.description.message}</p>}
           </div>
           <div>
-            <Input {...register("duration", { valueAsNumber: true })} type="number" placeholder="Duración (min)" />
+            <Input
+              {...register("duration", { valueAsNumber: true })}
+              type="number"
+              placeholder="Duración (min)"
+              onChange={(e) => setFormattedDuration(formatDuration(Number(e.target.value)))}
+            />
+            <p className="text-gray-600">{formattedDuration}</p>
             {errors.duration && <p className="text-red-500">{errors.duration.message}</p>}
           </div>
           <div>
-            <Input {...register("price", { valueAsNumber: true })} type="number" placeholder="Precio" />
+            <Input
+              {...register("price", { valueAsNumber: true })}
+              type="number"
+              placeholder="Precio"
+              onChange={(e) => setFormattedPrice(formatCurrency(Number(e.target.value)))}
+            />
+            <p className="text-gray-600">{formattedPrice}</p>
             {errors.price && <p className="text-red-500">{errors.price.message}</p>}
           </div>
           <DialogFooter className="mt-4">

@@ -46,12 +46,6 @@ export async function createService(
     if (!token)
       throw new Error("No se encontró el token de autenticación en la cookie");
 
-    if (typeof newService.price !== "number" || newService.price < 0) {
-      throw new Error("El precio debe ser un número mayor o igual a 0");
-    }
-
-    console.log("Datos enviados al backend:", newService);
-
     const response = await fetch(`${URL}/services`, {
       method: "POST",
       headers: {

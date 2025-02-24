@@ -38,7 +38,7 @@ export default function Sidebar() {
                             <h2 className="font-medium text-xs md:text-sm text-blue-500">
                                 {user && user?.name}
                             </h2>
-                            <p className="text-xs text-gray-500">{user && user?.roles[0]}</p>
+                            <p className="text-xs capitalize text-gray-500">{user && user?.roles[0]}</p>
                         </div>
                     </div>
 

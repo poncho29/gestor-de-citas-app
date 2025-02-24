@@ -1,18 +1,11 @@
 "use client";
 
 import { useState } from "react";
-
 import { useRouter } from "next/navigation";
-
 import ServiceForm from "./ServiceForm";
-
-
 import { deleteService, updateService, createService } from "@/actions/services";
-
 import { SimplifiedService } from "@/interfaces/services.interfaces";
-
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
-
 import { Button } from "@/components/ui/button";
 
 interface ServicesPageProps {
@@ -25,6 +18,24 @@ interface ServiceFormValues {
     duration: number;
     price: number;
 }
+
+const formatCurrency = (price: number) => {
+    return new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+    }).format(price);
+};
+
+
+const formatDuration = (minutes: number) => {
+    if (minutes >= 60) {
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        return remainingMinutes > 0 ? `${hours}hr ${remainingMinutes}min` : `${hours}hr`;
+    }
+    return `${minutes} min`;
+};
 
 export default function ServiceTable({ services }: ServicesPageProps) {
     const router = useRouter();
@@ -54,6 +65,7 @@ export default function ServiceTable({ services }: ServicesPageProps) {
         await deleteService(id);
         router.refresh();
     };
+
     const handleCreate = async (data: ServiceFormValues) => {
         await createService({
             ...data,
@@ -65,7 +77,6 @@ export default function ServiceTable({ services }: ServicesPageProps) {
         setIsCreateOpen(false);
         router.refresh();
     };
-
 
     return (
         <div className="container mx-auto p-4 capitalize">
@@ -98,8 +109,8 @@ export default function ServiceTable({ services }: ServicesPageProps) {
                             <tr key={service.id} className="border-b hover:bg-gray-50 transition-colors">
                                 <td className="py-3 px-4 text-gray-700">{service.name}</td>
                                 <td className="py-3 px-4 text-gray-700">{service.description}</td>
-                                <td className="py-3 px-4 text-gray-700">{service.duration} min</td>
-                                <td className="py-3 px-4 text-gray-700">${service.price}</td>
+                                <td className="py-3 px-4 text-gray-700">{formatDuration(service.duration)}</td>
+                                <td className="py-3 px-4 text-gray-700">{formatCurrency(service.price)}</td>
                                 <td className="py-3 px-4 flex justify-center gap-2">
                                     <button
                                         onClick={() => handleEdit(service)}
