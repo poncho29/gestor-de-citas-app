@@ -1,12 +1,17 @@
 "use client";
+import { useEffect, useState } from "react";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { SimplifiedService } from "../../../../interfaces/services.interfaces";
+
+import { SimplifiedService } from "@/interfaces";
+
+import { formatCurrency, formatDuration } from "@/utils";
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 
 const serviceSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio"),
@@ -57,25 +62,6 @@ export default function ServiceForm({
 
   const [formattedPrice, setFormattedPrice] = useState("");
   const [formattedDuration, setFormattedDuration] = useState("");
-
-  // Función para formatear el precio a pesos colombianos
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      minimumFractionDigits: 0,
-    }).format(value);
-  };
-
-
-  const formatDuration = (minutes: number) => {
-    if (minutes >= 60) {
-      const hours = Math.floor(minutes / 60);
-      const remainingMinutes = minutes % 60;
-      return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-    }
-    return `${minutes} min`;
-  };
 
   useEffect(() => {
     if (initialData) {
