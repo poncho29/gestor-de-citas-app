@@ -17,10 +17,9 @@ export interface User {
   deleted_at: string;
 }
 export interface SimplifiedUser {
-  id: string;
+  id?: string;
   name: string;
   email: string;
   phone: string;
   roles: Roles[];
-  enterprise: string | null;
 }

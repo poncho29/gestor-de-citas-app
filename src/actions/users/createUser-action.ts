@@ -6,29 +6,31 @@ import { SimplifiedUser } from "@/interfaces";
 const URL = process.env.URL_BASE;
 
 export async function createUser(
-  user: SimplifiedUser
+  userData: Omit<SimplifiedUser, "id">
 ): Promise<SimplifiedUser> {
   try {
-    console.log("Creando nuevo usuario...");
-
-    if (!URL)
+    if (!URL) {
       throw new Error("La variable de entorno URL_BASE no está definida.");
+    }
+
+    console.log("Creando un nuevo usuario...");
 
     const cookieValue = cookies().get(COOKIE_NAME)?.value;
-    if (!cookieValue)
+    if (!cookieValue) {
       throw new Error("No se encontró la cookie de autenticación");
+    }
 
-    let token;
+    let token: string;
     try {
-      const parsedCookie = JSON.parse(cookieValue || "{}");
-      token = parsedCookie.token;
+      token = JSON.parse(cookieValue).token;
     } catch (error) {
       console.error("Error al parsear la cookie:", error);
       throw new Error("El formato de la cookie no es válido");
     }
 
-    if (!token)
+    if (!token) {
       throw new Error("No se encontró el token de autenticación en la cookie");
+    }
 
     const response = await fetch(`${URL}/users`, {
       method: "POST",
@@ -36,7 +38,7 @@ export async function createUser(
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(user),
+      body: JSON.stringify(userData),
     });
 
     if (!response.ok) {
@@ -45,10 +47,10 @@ export async function createUser(
       throw new Error(`Error ${response.status}: ${errorMessage}`);
     }
 
-    const data = await response.json();
+    const data: SimplifiedUser = await response.json();
     console.log("Usuario creado exitosamente:", data);
 
-    return data as SimplifiedUser;
+    return data;
   } catch (error) {
     console.error("Error al crear el usuario:", error);
     throw error;

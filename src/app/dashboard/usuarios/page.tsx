@@ -1,8 +1,14 @@
+import { SimplifiedUser } from "@/interfaces";
+import { getUsers } from "@/actions/users";
+import TableUsers from "./components/TableUsers";
 
-export default function UsersPage() {
+export default async function Page() {
+
+  const users: SimplifiedUser[] = await getUsers(10, 0);
   return (
     <div>
-      <h1>Users Page</h1>
+      <TableUsers users={users} />
     </div>
   );
+
 }
