@@ -1,24 +1,35 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
+
 import dynamic from 'next/dynamic';
-import FormCalendar from './FormCalendar';
+
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/es';
-import { getRandomColor } from '@/utils/getRandomColor';
 
+import { FormCalendar, FormData } from './FormCalendar';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { AiOutlinePlus } from 'react-icons/ai';
-import { FormData } from './FormCalendar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+
+import { getRandomColor } from '@/utils/getRandomColor';
+
+import { AiOutlinePlus } from 'react-icons/ai';
+
+import { Appointment } from '@/interfaces';
+
 import "./styles/myCalendar.css";
 
 const FullCalendar = dynamic(() => import('@fullcalendar/react'), { ssr: false });
 
-export default function MyCalendar() {
+interface Props {
+    appointments: Appointment[];
+}
+
+export const MyCalendar = ({ appointments }: Props) => {
     const [events, setEvents] = useState<FormData[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -42,6 +53,12 @@ export default function MyCalendar() {
     const handleCancel = () => {
         console.log('Formulario cancelado');
     };
+
+    const formatedAppointments = appointments.map((appointment) => ({
+        title: `Cita con ${appointment.user.name}`,
+        start: new Date(appointment.start_time).toISOString(),
+        end: new Date(appointment.end_time).toISOString(),
+    }));
 
     return (
         <div className="w-full h-screen p-4 flex flex-col">
@@ -71,7 +88,7 @@ export default function MyCalendar() {
                     <FullCalendar
                         plugins={[dayGridPlugin, timeGridPlugin]}
                         initialView="dayGridMonth"
-                        events={events}
+                        events={formatedAppointments}
                         headerToolbar={{
                             left: 'prev,next today',
                             center: 'title',

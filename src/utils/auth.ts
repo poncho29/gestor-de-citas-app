@@ -47,3 +47,18 @@ export async function removeSession() {
   const cookieStore = cookies();
   cookieStore.delete(COOKIE_NAME);
 }
+
+
+export async function getToken (): Promise<{ token: string | null, error: string | null }> {
+  const cookieValue = cookies().get(COOKIE_NAME)?.value;
+  
+  if (!cookieValue )
+    return { token: null, error: "No se encontró la cookie de autenticación" };
+  
+  const { token } = JSON.parse(cookieValue);
+
+  if (!token)
+    return { token: null, error: "No se encontró el token de autenticación en la cookie" };
+
+  return { token, error: null };
+}

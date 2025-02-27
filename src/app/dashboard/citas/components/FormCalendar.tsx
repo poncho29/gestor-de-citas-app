@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +17,7 @@ interface FormCalendarProps {
     onCancel: () => void;
 }
 
-export default function FormCalendar({ onSubmit, onCancel }: FormCalendarProps) {
+export const FormCalendar = ({ onSubmit, onCancel }: FormCalendarProps) => {
     const { register, handleSubmit, reset, watch } = useForm<FormData>();
 
     const handleFormSubmit: SubmitHandler<FormData> = (data) => {
