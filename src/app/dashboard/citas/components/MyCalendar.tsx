@@ -1,67 +1,92 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
-
 import dynamic from 'next/dynamic';
-
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/es';
-
 import { FormCalendar, FormData } from './FormCalendar';
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-
 import { getRandomColor } from '@/utils/getRandomColor';
-
 import { AiOutlinePlus } from 'react-icons/ai';
+import { Appointment, SimplifiedUser, SimplifiedService } from '@/interfaces';
+import { getUsers } from '@/actions/users';
+import { getServices } from '@/actions/services';
+import { getAppointments } from '@/actions';
 
-import { Appointment } from '@/interfaces';
-
-import "./styles/myCalendar.css";
+import "./styles/myCalendar.css"; // Importa los estilos personalizados
 
 const FullCalendar = dynamic(() => import('@fullcalendar/react'), { ssr: false });
 
 interface Props {
-    appointments: Appointment[];
+    initialAppointments: Appointment[];
 }
 
-export const MyCalendar = ({ appointments }: Props) => {
+export const MyCalendar = ({ initialAppointments }: Props) => {
     const [events, setEvents] = useState<FormData[]>([]);
+    const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments || []);
     const [loading, setLoading] = useState(true);
+    const [clients, setClients] = useState<SimplifiedUser[]>([]);
+    const [services, setServices] = useState<SimplifiedService[]>([]);
 
     useEffect(() => {
-        setTimeout(() => {
-            setEvents([
-                {
-                    title: 'Evento de prueba',
-                    start: new Date().toISOString(),
-                    end: new Date(new Date().getTime() + 60 * 60 * 1000).toISOString(),
-                },
-            ]);
-            setLoading(false);
-        }, 2000);
+        const fetchData = async () => {
+            try {
+                const fetchedClients = await getUsers();
+                const fetchedServices = await getServices(100, 0);
+
+                const result = await getAppointments();
+
+                if (result.ok && Array.isArray(result.data?.appointments)) {
+                    setAppointments(result.data.appointments);
+                } else {
+                    console.error("Error al cargar citas:", result.error || "Datos inválidos");
+                }
+
+                setClients(fetchedClients);
+                setServices(fetchedServices);
+
+                setTimeout(() => {
+                    setLoading(false);
+                }, 2000);
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
     const handleEventSubmit = (data: FormData) => {
-        setEvents((prevEvents) => [...prevEvents, { ...data }]);
+        const newEvent = {
+            title: data.title,
+            start: data.start,
+            end: data.end || new Date(new Date(data.start).getTime() + 60 * 60 * 1000).toISOString(),
+            client: data.client,
+            services: data.services,
+        };
+
+        setEvents((prevEvents) => {
+            const updatedEvents = [...prevEvents, newEvent];
+            console.log("Estado actualizado de events:", updatedEvents);
+            return updatedEvents;
+        });
     };
 
-    const handleCancel = () => {
-        console.log('Formulario cancelado');
-    };
-
-    const formatedAppointments = appointments.map((appointment) => ({
-        title: `Cita con ${appointment.user.name}`,
-        start: new Date(appointment.start_time).toISOString(),
-        end: new Date(appointment.end_time).toISOString(),
-    }));
+    const formattedAppointments = Array.isArray(appointments)
+        ? appointments.map((appointment) => ({
+            title: `Cita con ${appointment.user.name}`,
+            start: new Date(appointment.start_time).toISOString(),
+            end: new Date(appointment.end_time).toISOString(),
+        }))
+        : [];
 
     return (
         <div className="w-full h-screen p-4 flex flex-col">
+            {/* Botón "Agregar Evento" */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
                 <Dialog>
                     <DialogTrigger asChild>
@@ -74,11 +99,18 @@ export const MyCalendar = ({ appointments }: Props) => {
                         <DialogHeader>
                             <DialogTitle className="text-lg font-semibold text-gray-800">Crear Evento</DialogTitle>
                         </DialogHeader>
-                        <FormCalendar onSubmit={handleEventSubmit} onCancel={handleCancel} />
+                        <FormCalendar
+                            onSubmit={handleEventSubmit}
+                            onCancel={() => { }}
+                            clients={clients}
+                            services={services}
+                        />
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="w-full flex-grow h-[85vh] overflow-hidden">
+
+            {/* Calendario */}
+            <div className="w-full flex-grow overflow-hidden">
                 {loading ? (
                     <div className="w-full h-full flex flex-col gap-4">
                         <Skeleton className="h-10 w-full rounded-md" />
@@ -88,14 +120,14 @@ export const MyCalendar = ({ appointments }: Props) => {
                     <FullCalendar
                         plugins={[dayGridPlugin, timeGridPlugin]}
                         initialView="dayGridMonth"
-                        events={formatedAppointments}
+                        events={[...formattedAppointments, ...events]}
                         headerToolbar={{
                             left: 'prev,next today',
                             center: 'title',
                             right: 'dayGridMonth,timeGridWeek,timeGridDay',
                         }}
                         locale={esLocale}
-                        height="100%"
+                        height="100%" // Asegura que el calendario ocupe toda la altura
                         contentHeight="auto"
                         eventContent={(eventInfo) => {
                             const { bgColor, textColor, borderColor } = getRandomColor();
@@ -129,4 +161,4 @@ export const MyCalendar = ({ appointments }: Props) => {
             </div>
         </div>
     );
-}
+};

@@ -24,13 +24,13 @@ export default function UserTable({ users }: UsersPageProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState<Partial<SimplifiedUser> | null>(null);
 
-    // Manejar la edición de un usuario
+
     const handleEdit = (user: SimplifiedUser) => {
         setCurrentUser(user);
         setIsEditOpen(true);
     };
 
-    // Manejar la actualización de un usuario
+
     const handleUpdate = async (data: UserFormValues) => {
         if (!currentUser || !currentUser.id) return;
         await updateUser(currentUser.id, {
@@ -41,13 +41,12 @@ export default function UserTable({ users }: UsersPageProps) {
         router.refresh();
     };
 
-    // Manejar la eliminación de un usuario
+
     const handleDelete = async (id: string) => {
         await deleteUser(id);
         router.refresh();
     };
 
-    // Manejar la creación de un nuevo usuario
     const handleCreate = async (data: UserFormValues) => {
         await createUser({
             ...data,
@@ -109,7 +108,6 @@ export default function UserTable({ users }: UsersPageProps) {
                 </tbody>
             </table>
 
-            {/* Modal para editar un usuario */}
             {isEditOpen && currentUser && (
                 <UserForm
                     isOpen={isEditOpen}
@@ -126,7 +124,6 @@ export default function UserTable({ users }: UsersPageProps) {
                 />
             )}
 
-            {/* Modal para crear un nuevo usuario */}
             {isCreateOpen && (
                 <UserForm
                     isOpen={isCreateOpen}

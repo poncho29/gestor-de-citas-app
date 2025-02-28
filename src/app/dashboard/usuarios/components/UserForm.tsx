@@ -25,7 +25,7 @@ interface UserFormProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: SimplifiedUser) => Promise<void>;
-    initialData?: Partial<SimplifiedUser>; // Permitir datos parciales
+    initialData?: Partial<SimplifiedUser>;
     title: string;
     submitText: string;
 }
@@ -49,14 +49,12 @@ export default function UserForm({ isOpen, onClose, onSubmit, initialData, title
         },
     });
 
-    // Resetear el formulario cuando se cierra el diálogo
     useEffect(() => {
         if (!isOpen) {
             reset();
         }
     }, [isOpen, reset]);
 
-    // Establecer valores iniciales si se proporciona `initialData`
     useEffect(() => {
         if (initialData) {
             reset({
@@ -75,12 +73,12 @@ export default function UserForm({ isOpen, onClose, onSubmit, initialData, title
         }
     }, [initialData, reset]);
 
-    // Manejador de envío del formulario
+
     const onSubmitHandler: SubmitHandler<UserFormValues> = async (data) => {
         setIsLoading(true);
         try {
             await onSubmit(data as SimplifiedUser);
-            reset(); // Limpiar el formulario después de enviar
+            reset();
         } finally {
             setIsLoading(false);
         }
@@ -93,7 +91,6 @@ export default function UserForm({ isOpen, onClose, onSubmit, initialData, title
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
-                    {/* Campo de Nombre */}
                     <div>
                         <label htmlFor="name" className="block mb-1 text-gray-700">
                             Nombre
@@ -102,7 +99,7 @@ export default function UserForm({ isOpen, onClose, onSubmit, initialData, title
                         {errors.name && <p className="text-red-500">{errors.name.message}</p>}
                     </div>
 
-                    {/* Campo de Correo Electrónico */}
+
                     <div>
                         <label htmlFor="email" className="block mb-1 text-gray-700">
                             Correo electrónico
@@ -111,7 +108,7 @@ export default function UserForm({ isOpen, onClose, onSubmit, initialData, title
                         {errors.email && <p className="text-red-500">{errors.email.message}</p>}
                     </div>
 
-                    {/* Campo de Teléfono */}
+
                     <div>
                         <label htmlFor="phone" className="block mb-1 text-gray-700">
                             Teléfono
@@ -120,7 +117,7 @@ export default function UserForm({ isOpen, onClose, onSubmit, initialData, title
                         {errors.phone && <p className="text-red-500">{errors.phone.message}</p>}
                     </div>
 
-                    {/* Campo de Rol */}
+
                     <div>
                         <label htmlFor="roles" className="block mb-1 text-gray-700">
                             Rol
@@ -143,7 +140,6 @@ export default function UserForm({ isOpen, onClose, onSubmit, initialData, title
                         {errors.roles && <p className="text-red-500">{errors.roles.message}</p>}
                     </div>
 
-                    {/* Pie del Diálogo */}
                     <DialogFooter className="mt-4">
                         <Button
                             type="button"
