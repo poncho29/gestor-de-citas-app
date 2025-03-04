@@ -22,7 +22,7 @@ function mapService(response: ServiceResponse): SimplifiedService {
 export async function getServices(
   limit: number = 10,
   offset: number = 0
-): Promise<SimplifiedService[]> {
+): Promise<{ services: SimplifiedService[]; total: number }> {
   try {
     const cookieStore = cookies();
     const cookieValue = cookieStore.get(COOKIE_NAME)?.value;
@@ -59,16 +59,13 @@ export async function getServices(
     }
 
     const data = await response.json();
-    console.log("Datos recibidos del backend:", data);
 
-    const services = Array.isArray(data) ? data : data?.services;
+    const services = Array.isArray(data.services)
+      ? data.services.map(mapService)
+      : [];
+    const total = typeof data.total === "number" ? data.total : 0;
 
-    if (!Array.isArray(services)) {
-      console.error("La API no devolvió una lista de servicios:", data);
-      throw new Error("Formato de respuesta inválido");
-    }
-
-    return services.map(mapService);
+    return { services, total };
   } catch (error) {
     console.error("Error al obtener los servicios:", error);
     throw error;

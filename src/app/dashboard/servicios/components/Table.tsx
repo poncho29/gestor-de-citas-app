@@ -3,15 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ServiceForm from "./ServiceForm";
-import { deleteService, updateService, createService } from "@/actions/services";
+import { deleteService, updateService, createService, getServices } from "@/actions/services";
 import { SimplifiedService } from "@/interfaces/services.interfaces";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDuration } from "@/utils";
 
-
 interface ServicesPageProps {
-    services: SimplifiedService[];
+    initialServices: SimplifiedService[];
+    totalServices: number; // Total de servicios disponibles
 }
 
 interface ServiceFormValues {
@@ -21,11 +21,30 @@ interface ServiceFormValues {
     price: number;
 }
 
-export default function ServiceTable({ services }: ServicesPageProps) {
+export default function ServiceTable({ initialServices, totalServices }: ServicesPageProps) {
     const router = useRouter();
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [currentService, setCurrentService] = useState<Partial<SimplifiedService> | null>(null);
+
+    // Estado para la paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [services, setServices] = useState<SimplifiedService[]>(initialServices);
+    const limit = 10;
+
+    const totalPages = Math.ceil(totalServices / limit);
+
+    const loadServices = async (page: number) => {
+        try {
+            const offset = (page - 1) * limit;
+            const response = await getServices(limit, offset);
+            const fetchedServices = response.services;
+            setServices(fetchedServices);
+            setCurrentPage(page);
+        } catch (error) {
+            console.error("Error al cargar servicios:", error);
+        }
+    };
 
     const handleEdit = (service: SimplifiedService) => {
         setCurrentService(service);
@@ -115,6 +134,28 @@ export default function ServiceTable({ services }: ServicesPageProps) {
                 </tbody>
             </table>
 
+            {/* Paginación */}
+            <div className="flex justify-center items-center mt-6 space-x-2">
+                <Button
+                    variant="outline"
+                    onClick={() => loadServices(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Anterior
+                </Button>
+                <span className="text-gray-700 font-medium">
+                    Página {currentPage} de {totalPages}
+                </span>
+                <Button
+                    variant="outline"
+                    onClick={() => loadServices(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                >
+                    Siguiente
+                </Button>
+            </div>
+
+            {/* Modales */}
             {isEditOpen && (
                 <ServiceForm
                     isOpen={isEditOpen}

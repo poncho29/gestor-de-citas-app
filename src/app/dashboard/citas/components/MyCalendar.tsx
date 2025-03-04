@@ -35,7 +35,10 @@ export const MyCalendar = ({ initialAppointments }: Props) => {
         const fetchData = async () => {
             try {
                 const fetchedClients = await getUsers();
-                const fetchedServices = await getServices(100, 0);
+                const fetchedServicesResponse = await getServices(100, 0);
+
+                // Extrae solo los servicios del resultado
+                const fetchedServices = fetchedServicesResponse.services;
 
                 const result = await getAppointments();
 
