@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { SimplifiedUser, Roles } from "@/interfaces";
+import { createUser, updateUser } from "@/actions/users"; // Importa las acciones
+import { toast } from "sonner"; // Importa Sonner para notificaciones
 
 const phoneRegex = /^[0-9]{10,}$/;
 
@@ -64,14 +66,28 @@ export default function UserForm({ onClose, initialData }: UserFormProps) {
         }
     }, [initialData, reset]);
 
-
     const onSubmitHandler: SubmitHandler<UserFormValues> = async (data) => {
         setIsLoading(true);
         try {
-            // ejecucion de crear o actualizar usuario
-
+            if (isEdit && initialData?.id) {
+                const result = await updateUser(initialData.id, data);
+                if (result.ok) {
+                    toast.success("Usuario actualizado correctamente");
+                } else {
+                    toast.error(result.error || "Error al actualizar el usuario");
+                }
+            } else {
+                const result = await createUser(data);
+                if (result.ok) {
+                    toast.success("Usuario creado correctamente");
+                } else {
+                    toast.error(result.error || "Error al crear el usuario");
+                }
+            }
             reset();
             onClose && onClose();
+        } catch (error) {
+            toast.error("Error inesperado al procesar la solicitud");
         } finally {
             setIsLoading(false);
         }
@@ -87,7 +103,6 @@ export default function UserForm({ onClose, initialData }: UserFormProps) {
                 {errors.name && <p className="text-red-500">{errors.name.message}</p>}
             </div>
 
-
             <div>
                 <label htmlFor="email" className="block mb-1 text-gray-700">
                     Correo electrónico
@@ -96,7 +111,6 @@ export default function UserForm({ onClose, initialData }: UserFormProps) {
                 {errors.email && <p className="text-red-500">{errors.email.message}</p>}
             </div>
 
-
             <div>
                 <label htmlFor="phone" className="block mb-1 text-gray-700">
                     Teléfono
@@ -104,7 +118,6 @@ export default function UserForm({ onClose, initialData }: UserFormProps) {
                 <Input id="phone" {...register("phone")} placeholder="Teléfono" />
                 {errors.phone && <p className="text-red-500">{errors.phone.message}</p>}
             </div>
-
 
             <div>
                 <label htmlFor="roles" className="block mb-1 text-gray-700">
@@ -145,6 +158,5 @@ export default function UserForm({ onClose, initialData }: UserFormProps) {
                 </Button>
             </div>
         </form>
-
     );
 }

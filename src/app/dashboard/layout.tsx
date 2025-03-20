@@ -1,4 +1,5 @@
 import Sidebar from "@/components/sidebar/Sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function DashboardLayout({
     children
@@ -10,6 +11,7 @@ export default function DashboardLayout({
             <Sidebar />
             <div className="flex-1 transition-all duration-300 ease-in-out">
                 {children}
+                <Toaster />
             </div>
         </div>
     );

@@ -53,7 +53,7 @@ export const MyCalendar = ({ initialAppointments }: Props) => {
 
                 setTimeout(() => {
                     setLoading(false);
-                }, 2000);
+                }, 1000);
             } catch (error) {
                 console.error("Error al cargar datos:", error);
                 setLoading(false);
