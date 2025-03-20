@@ -5,7 +5,7 @@ export enum Roles {
   CLIENT = "client",
 }
 
-export interface User {
+export interface IUser {
   id: string;
   name: string;
   email: string;
@@ -16,10 +16,13 @@ export interface User {
   updated_at: string;
   deleted_at: string;
 }
-export interface SimplifiedUser {
-  id?: string;
-  name: string;
-  email: string;
-  phone: string;
-  roles: Roles[];
+
+export interface IUserResponse {
+  users: IUser[];
+  total: number;
 }
+
+export type TCreateUser = Omit<IUser, "id" | "token" | "created_at" | "updated_at" | "deleted_at"> & {
+  id?: string,
+  password: string
+};

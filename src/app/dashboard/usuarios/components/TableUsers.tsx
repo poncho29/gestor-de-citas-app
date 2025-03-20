@@ -1,14 +1,19 @@
 "use client";
+
 import { useState } from "react";
+
 import { useRouter } from "next/navigation";
-import UserForm from "./UserForm";
+
 import { deleteUser, updateUser, createUser } from "@/actions/users";
-import { SimplifiedUser, Roles } from "@/interfaces";
+
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import UserForm from "./UserForm";
+
+import { IUser, Roles } from "@/interfaces";
 
 interface UsersPageProps {
-    users: SimplifiedUser[];
+    users: IUser[];
 }
 
 interface UserFormValues {
@@ -20,16 +25,16 @@ interface UserFormValues {
 
 export default function UserTable({ users }: UsersPageProps) {
     const router = useRouter();
+
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [currentUser, setCurrentUser] = useState<Partial<SimplifiedUser> | null>(null);
+    const [currentUser, setCurrentUser] = useState<Partial<IUser> | null>(null);
 
 
-    const handleEdit = (user: SimplifiedUser) => {
+    const handleEdit = (user: IUser) => {
         setCurrentUser(user);
         setIsEditOpen(true);
     };
-
 
     const handleUpdate = async (data: UserFormValues) => {
         if (!currentUser || !currentUser.id) return;
@@ -41,16 +46,22 @@ export default function UserTable({ users }: UsersPageProps) {
         router.refresh();
     };
 
-
     const handleDelete = async (id: string) => {
         await deleteUser(id);
         router.refresh();
     };
 
     const handleCreate = async (data: UserFormValues) => {
+        console.log({
+            ...data,
+            phone: `+57${data.phone}`,
+            password: "password123.",
+            // roles: data.roles,
+        })
         await createUser({
             ...data,
-            roles: data.roles,
+            phone: `+57${data.phone}`,
+            password: "password123.",
         });
         setIsCreateOpen(false);
         router.refresh();
@@ -82,7 +93,7 @@ export default function UserTable({ users }: UsersPageProps) {
                             </td>
                         </tr>
                     ) : (
-                        users.map((user, index) => (
+                        users && users.map((user, index) => (
                             <tr key={index} className="border-b hover:bg-gray-50 transition-colors">
                                 <td className="py-3 px-4 text-gray-700">{user.name}</td>
                                 <td className="py-3 px-4 text-gray-700">{user.email}</td>
