@@ -8,7 +8,7 @@ import { useAuth } from '@/context/hook/useAuth';
 
 import SidebarLink from './SidebarLinks';
 
-import { AiOutlineHome, AiOutlineSearch, AiOutlineMenu, AiOutlineUser, AiOutlineCalendar, AiOutlineLogout, AiOutlineBank } from "react-icons/ai";
+import { AiOutlineHome, AiOutlineMenu, AiOutlineUser, AiOutlineCalendar, AiOutlineLogout, AiOutlineBank } from "react-icons/ai";
 
 export default function Sidebar() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -41,18 +41,6 @@ export default function Sidebar() {
                             <p className="text-xs capitalize text-gray-500">{user && user?.roles[0]}</p>
                         </div>
                     </div>
-
-                    <div className="flex px-3 border-2 rounded-md focus-within:border focus-within:ring-2 ring-blue-500 border-gray-200 mb-4">
-                        <input
-                            type="text"
-                            className="w-full rounded-tl-md rounded-bl-md px-2 py-3 text-sm focus:outline-none text-gray-600 md:mr-2"
-                            placeholder="Buscar..."
-                        />
-                        <button className="rounded-tr-md rounded-br-md px-2 hidden md:block">
-                            <AiOutlineSearch />
-                        </button>
-                    </div>
-
                     <div className="flex flex-col gap-1">
                         <SidebarLink href="/dashboard/citas" text="Citas" icon={<AiOutlineCalendar />} />
                         <SidebarLink href="/dashboard/servicios" text="Servicios" icon={<AiOutlineHome />} />

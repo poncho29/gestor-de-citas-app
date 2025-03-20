@@ -51,9 +51,7 @@ export const MyCalendar = ({ initialAppointments }: Props) => {
                 setClients(fetchedClients);
                 setServices(fetchedServices);
 
-                setTimeout(() => {
-                    setLoading(false);
-                }, 2000);
+
             } catch (error) {
                 console.error("Error al cargar datos:", error);
                 setLoading(false);
