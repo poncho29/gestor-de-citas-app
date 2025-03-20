@@ -16,10 +16,13 @@ export interface User {
   updated_at: string;
   deleted_at: string;
 }
-export interface SimplifiedUser {
-  id?: string;
-  name: string;
-  email: string;
-  phone: string;
-  roles: Roles[];
+
+export interface ResponseUser {
+  users: User[];
+  total: number;
 }
+
+export type SimplifiedUser = Omit<
+  User,
+  "token" | "created_at" | "updated_at" | "deleted_at"
+>;

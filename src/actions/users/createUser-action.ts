@@ -1,35 +1,18 @@
 "use server";
-import { cookies } from "next/headers";
-import { COOKIE_NAME } from "@/utils/api";
-import { SimplifiedUser } from "@/interfaces";
+
+import { Result, SimplifiedUser } from "@/interfaces";
+import { getToken } from "@/utils";
 
 const URL = process.env.URL_BASE;
 
 export async function createUser(
   userData: Omit<SimplifiedUser, "id">
-): Promise<SimplifiedUser> {
+): Promise<Result<SimplifiedUser>> {
   try {
-    if (!URL) {
-      throw new Error("La variable de entorno URL_BASE no está definida.");
-    }
+    const { token, error } = await getToken();
 
-    console.log("Creando un nuevo usuario...");
-
-    const cookieValue = cookies().get(COOKIE_NAME)?.value;
-    if (!cookieValue) {
-      throw new Error("No se encontró la cookie de autenticación");
-    }
-
-    let token: string;
-    try {
-      token = JSON.parse(cookieValue).token;
-    } catch (error) {
-      console.error("Error al parsear la cookie:", error);
-      throw new Error("El formato de la cookie no es válido");
-    }
-
-    if (!token) {
-      throw new Error("No se encontró el token de autenticación en la cookie");
+    if (!token && error) {
+      throw new Error(error);
     }
 
     const response = await fetch(`${URL}/users`, {
@@ -50,9 +33,9 @@ export async function createUser(
     const data: SimplifiedUser = await response.json();
     console.log("Usuario creado exitosamente:", data);
 
-    return data;
+    return { ok: true, data, error: null };
   } catch (error) {
     console.error("Error al crear el usuario:", error);
-    throw error;
+    return { ok: false, data: null, error: (error as Error).message };
   }
 }

@@ -1,31 +1,22 @@
 "use server";
-import { cookies } from "next/headers";
-import { COOKIE_NAME } from "@/utils/api";
-import { SimplifiedUser } from "@/interfaces";
+
+import { ResponseUser, Result } from "@/interfaces";
+
+import { getToken } from "@/utils";
 
 const URL = process.env.URL_BASE;
 
 export async function getUsers(
   limit = 10,
   offset = 0
-): Promise<SimplifiedUser[]> {
+): Promise<Result<ResponseUser>> {
   try {
-    console.log("Obteniendo lista de usuarios...");
-    if (!URL)
-      throw new Error("La variable de entorno URL_BASE no está definida.");
-    const cookieValue = cookies().get(COOKIE_NAME)?.value;
-    if (!cookieValue)
-      throw new Error("No se encontró la cookie de autenticación");
-    let token;
-    try {
-      const parsedCookie = JSON.parse(cookieValue || "{}");
-      token = parsedCookie.token;
-    } catch (error) {
-      console.error("Error al parsear la cookie:", error);
-      throw new Error("El formato de la cookie no es válido");
+    const { token, error } = await getToken();
+
+    if (!token && error) {
+      throw new Error(error);
     }
-    if (!token)
-      throw new Error("No se encontró el token de autenticación en la cookie");
+
     const response = await fetch(
       `${URL}/users?limit=${limit}&offset=${offset}`,
       {
@@ -44,10 +35,11 @@ export async function getUsers(
     const data = await response.json();
     console.log("Usuarios obtenidos exitosamente:", data);
 
-    const usersArray = data?.users || [];
-    return usersArray as SimplifiedUser[];
+    return { ok: true, data, error: null };
   } catch (error) {
     console.error("Error al obtener los usuarios:", error);
-    throw error;
+    const errorMessage =
+      error instanceof Error ? error.message : "Error al obtener los usuarios";
+    return { ok: false, data: null, error: errorMessage };
   }
 }
